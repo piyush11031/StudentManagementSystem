@@ -1,0 +1,66 @@
+Create Student Entity
+
+Next we create a StudentRepository which extends JPARepository.
+
+First we implement showing all the students:
+
+    1. We create service interface StudentService and add method getAllStudents() which return list of all students
+
+    2. We implement StudentService interface in StudentServiceImpl class. We get the StudentRepostory bean form dependency injection
+into the class and Implement the getAllStudent() method by returning studentRepository.findAll(). .findAll() is a predefined
+method in the JPARepository.
+
+    3. In the StudentController, we implement a handler method listStudents with mapping "/students". It takes Model object
+as an input and returns a view "students". In model.addAttribute method, the attribute name "students" is the key that contains
+list of all the students. We can use this "students" in the view "students.html" in a for loop to display each element.
+
+    4. In the view "students.html", we write xmlns:th="http://thymeleaf.org" to use thymeleaf in our html file. Next
+we use th:each = "student: ${students}" as for lop to display all students and th:text = "${student.firstName}" to
+display each attribute. We also add a button "Add Students" with help of th:href = @{/students/new}". This generates a
+url that points to path "/students/new" in out application.
+
+Next we implement add students:
+
+    1. In the StudentService interface we add a method saveStudent. Then in StudentServiceImpl we implement this method
+by returning studentRepository.save(student). .save method saves the enitity in the database.
+
+    2. In the controller, we implement handler method createStudentForm with mapping "/students/new".
+We create an empty student object to hold the form information.
+In model.addAttribute method, the attribute "student" key contains a empty student object. The handle method returns
+view create_student
+
+    3.In create_student.html file,this form is set up to submit data to the /students URL. The form tag has attrute
+th:action="@{/students}". This attribute is used in form submissions and defines the URL where the form data should be sent for
+processing as a POST method. The PostMapping annotation will help save the form data
+th:object="${student}", th:object is used to bind a model object to the form. The form inputs will be populated with
+data from the student object.
+th:field="*{firstName}" is used to bind the input field of the form to property named "firstName" of the student object.
+
+    4. Now we have to handle the request th:action="@{/students}". In the controller, We use @PostMapping to handle
+incoming POST request to the url "/students".
+The (@ModelAttribute("student") Student student) part tells Spring MVC to take the form data, bind it to a Student object,
+and place that object in the model with the name "student". This allows you to access and use the form data in your
+view templates.
+One student is added, we're gonna redirect to students page, which is the first handler method in controller
+
+Next we implement update student feature:
+1. First we add a update button in the action column of the table in "students.html". Clicking that button redirects to update page.
+ th:href="@{/students/edit/{id}(id=${student.id})}", {id} is a placeholder for student.id value. This code generates
+a URL that would point to edit page of a student of that Id.
+
+    2. Next we implement getStudentById in the StudentServiceImpl class.
+
+    2. To open Update page, we write a handler method editStudent in controller with path : "/students/edit/{id}"
+@PathVariable Long id: This annotation is used to bind the {id} value from the URL path to the id parameter of the method
+editStudent. Here using the model.addAttibute, we bind "student" key to student object of that id. This method returns a
+view edit_student.
+
+    3. edit_student.html file is similar to create_student.html. The only difference is we have
+th:action="@{/students/{id}(id=${student.id})} as a POST method in the form tag that redirect you to url "/students/{id}".
+Therefor we have to create a PostMapping for that url in StudentController.
+
+    5. Then we implement updateStudent in StudentServiceImpl
+
+    6. We implement handler method updateStudent in controller with PostMapping. This method update the student
+and redirects you to "/students" page.
+
